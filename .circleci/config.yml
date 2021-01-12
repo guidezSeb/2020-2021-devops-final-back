@@ -8,11 +8,16 @@ jobs:
       - restore_cache:
           key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
       - run:
-          name: Install dependencies in a python venv
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements/dev.txt
+          name: Install dependencies in venv
+          command: python3 -m venv venv
+      - run:
+          name: Activate venv
+          command: . venv/bin/activate
+      - run:
+          name: Install requirements
+          command: pip install -r requirements/dev.txt
+            
+            
       - save_cache:
           key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
           paths: 
@@ -21,46 +26,54 @@ jobs:
     docker: 
       - image: circleci/python:3.9-buster-node-browsers
         environment:
-          DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/psdb
+          DATABASE_URL: postgresql://myUser:myPassword@localhost:5432/my_database_postgres
           FLASK_APP: autoapp.py
           CONDUIT_SECRET: 'something-really-secret'
           FLASK_DEBUG: 1
       - image: circleci/postgres:9.6.2-alpine
         environment:
-          POSTGRES_USER: myUsr
-          POSTGRES_DB: psdb
-          POSTGRES_PASSWORD: somePwd
+          POSTGRES_USER: myUser
+          POSTGRES_DB: my_database_postgres
+          POSTGRES_PASSWORD: myPassword
     steps:
       - checkout
       - restore_cache:
           key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
       - run: 
-          name: Waiting for postgresql
+          name: Waiting postgresql
           command : dockerize -wait tcp://localhost:5432 -timeout 1m
       - run: 
+          name: Activate tests
+          command: . venv/bin/activate
+      - run: 
+          name: Launching upgrade
+          command: flask db upgrade      
+      - run: 
           name: Launching tests
-          command: |
-            . venv/bin/activate
-            flask db upgrade
-            flask test
+          command: flask test      
+            
   deploy-heroku:
     docker: 
       - image : buildpack-deps:trusty
     steps:
       - checkout
       - run:
+          name: Config main to heroku
+          command: git config --global push.default matching
+      - run:
           name: Deploy main to heroku
-          command: |
-            git config --global push.default matching
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main
+          command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main   
+            
       - run:
           name: Smoke test
-          command: |
-            HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/api/articles`
-            if [ "$HTTPCODE" -ne 200 ];then
-              echo "heroku app not responding, failing deploy"
-              exit 1
-            fi
+          command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/api/articles`
+      - run:
+          name: Smoke check
+          command:  if [ "$HTTPCODE" -ne 200 ];then
+                      echo "heroku app not responding, failing to deploy"
+                      exit 1
+                    fi  
+            
   docker-build-push:
     working_directory: /dockerapp
     docker:
@@ -69,17 +82,24 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name:  dockerize the app 
-          command: |
-            docker build --cache-from=app -t app .
+          name:  dockerize my app 
+          command: docker build --cache-from=app -t app .
       - run: 
-          name: Publish app to docker hub
-          command: |
-            docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-            docker tag app $DOCKER_HUB_USERNAME/tp-devops-final-api:$CIRCLE_BUILD_NUM
-            docker tag app $DOCKER_HUB_USERNAME/tp-devops-final-api:latest
-            docker push $DOCKER_HUB_USERNAME/tp-devops-final-api:$CIRCLE_BUILD_NUM
-            docker push $DOCKER_HUB_USERNAME/tp-devops-final-api:latest
+          name: Login my app to the hub
+          command: docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+      - run: 
+          name: Tag my app 
+          command: docker tag app $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:$CIRCLE_BUILD_NUM      
+      - run: 
+          name: Tag my app to latest
+          command: docker tag app $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:latest    
+      - run: 
+          name: Publish my app
+          command:  docker push $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:$CIRCLE_BUILD_NUM        
+      - run: 
+          name: Publish my app to the hub
+          command:  docker push $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:latest  
+           
 workflows:
   build_test_deploy:
     jobs:
@@ -88,12 +108,10 @@ workflows:
           requires:
             - build
       - deploy-heroku:
-          context: Heroku
+          context: Heroku-tp-final
           requires: 
             - build
-            # - test (We don't require test as there's a problem with them atm)
       - docker-build-push:
-          context: Docker
+          context: Docker-tp-final
           requires: 
             - build
-            # - test (We don't require test as there's a problem with them atm)
