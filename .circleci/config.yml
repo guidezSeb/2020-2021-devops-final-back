@@ -108,12 +108,10 @@ workflows:
           requires:
             - build
       - deploy-heroku:
-          context: Heroku
+          context: Heroku-tp-final
           requires: 
             - build
-            # - test (We don't require test as there's a problem with them atm)
       - docker-build-push:
-          context: Docker
+          context: Docker-tp-final
           requires: 
             - build
-            # - test (We don't require test as there's a problem with them atm)
