@@ -89,16 +89,16 @@ jobs:
           command: docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
       - run: 
           name: Tag my app 
-          command: docker tag app $DOCKER_HUB_USERNAME/tp-devops-final-back:$CIRCLE_BUILD_NUM      
+          command: docker tag app $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:$CIRCLE_BUILD_NUM      
       - run: 
           name: Tag my app to latest
-          command: docker tag app $DOCKER_HUB_USERNAME/tp-devops-final-back:latest    
+          command: docker tag app $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:latest    
       - run: 
           name: Publish my app
-          command:  docker push $DOCKER_HUB_USERNAME/tp-devops-final-back:$CIRCLE_BUILD_NUM        
+          command:  docker push $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:$CIRCLE_BUILD_NUM        
       - run: 
           name: Publish my app to the hub
-          command:  docker push $DOCKER_HUB_USERNAME/tp-devops-final-back:latest  
+          command:  docker push $DOCKER_HUB_USERNAME/2020-2021-devops-final-back:latest  
            
 workflows:
   build_test_deploy:
