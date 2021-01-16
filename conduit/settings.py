@@ -25,6 +25,7 @@ class Config(object):
         'http://localhost:4200',
         'http://0.0.0.0:4000',
         'http://localhost:4000',
+        'https://reverent-swanson-5ad65a.netlify.app',
     ]
     JWT_HEADER_TYPE = 'Token'
 
