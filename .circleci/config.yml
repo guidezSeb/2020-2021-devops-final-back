@@ -70,8 +70,7 @@ jobs:
       - run:
           name: Smoke check
           command:  if [[ "$HTTPCODE" -ne 200 ]];then
-                      echo "heroku app not responding, failing to deploy"
-                      exit 1
+                      echo "heroku app not responding, failing to deploy" &&  exit 1;
                     fi
   docker-build-push:
     working_directory: /dockerapp
