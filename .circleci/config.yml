@@ -22,35 +22,35 @@ jobs:
           key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
           paths: 
             - "venv"
-  # test:
-  #   docker: 
-  #     - image: circleci/python:3.9-buster-node-browsers
-  #       environment:
-  #         DATABASE_URL: postgresql://myUser:myPassword@localhost:5432/my_database_postgres
-  #         FLASK_APP: autoapp.py
-  #         CONDUIT_SECRET: 'something-really-secret'
-  #         FLASK_DEBUG: 1
-  #     - image: circleci/postgres:9.6.2-alpine
-  #       environment:
-  #         POSTGRES_USER: myUser
-  #         POSTGRES_DB: my_database_postgres
-  #         POSTGRES_PASSWORD: myPassword
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
-  #     - run: 
-  #         name: Waiting postgresql
-  #         command : dockerize -wait tcp://localhost:5432 -timeout 1m
-  #     - run: 
-  #         name: Activate tests
-  #         command: . venv/bin/activate
-  #     - run: 
-  #         name: Launching upgrade
-  #         command: flask db upgrade      
-  #     - run: 
-  #         name: Launching tests
-  #         command: flask test      
+  test:
+    docker: 
+      - image: circleci/python:3.9-buster-node-browsers
+        environment:
+          DATABASE_URL: postgresql://myUser:myPassword@localhost:5432/my_database_postgres
+          FLASK_APP: autoapp.py
+          CONDUIT_SECRET: 'something-really-secret'
+          FLASK_DEBUG: 1
+      - image: circleci/postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: myUser
+          POSTGRES_DB: my_database_postgres
+          POSTGRES_PASSWORD: myPassword
+    steps:
+      - checkout
+      - restore_cache:
+          key: deps-{{ checksum "requirements/dev.txt"}}-{{ .Environment.CACHE_VERSION }}
+      - run: 
+          name: Waiting postgresql
+          command : dockerize -wait tcp://localhost:5432 -timeout 1m
+      # - run: 
+      #     name: Activate tests
+      #     command: . venv/bin/activate
+      # - run: 
+      #     name: Launching upgrade
+      #     command: flask db upgrade      
+      # - run: 
+      #     name: Launching tests
+      #     command: flask test      
             
   deploy-heroku:
     docker: 
