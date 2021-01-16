@@ -69,7 +69,7 @@ jobs:
           command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/api/articles`
       - run:
           name: Smoke check
-          command:  if [ "$HTTPCODE" -ne 200 ];then  echo "heroku app not responding, failing to deploy" exit 1  fi
+          command:  if [ "$HTTPCODE" -ne 200 ];then  echo "heroku app not responding, failing to deploy" exit 1  fi;
   docker-build-push:
     working_directory: /dockerapp
     docker:
