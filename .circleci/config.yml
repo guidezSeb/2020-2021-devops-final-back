@@ -64,14 +64,14 @@ jobs:
           name: Deploy main to heroku
           command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main   
             
-     - run:
+      - run:
           name: Smoke test
-          command: |
-            HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/api/articles`
-            if [ "$HTTPCODE" -ne 200 ];then
-              echo "heroku app not responding, failing deploy"
-              exit 1
-            fi
+          command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" curl -s -o /dev/null -w "%{http_code}" https://whispering-forest-11533.herokuapp.com/api/articles`
+      - run:
+          name: Smoke test check
+          command:  if [[ "$HTTPCODE" -ne 200 ]];then
+                      echo "heroku app not responding, failing to deploy" &&  exit 1;
+                    fi
   docker-build-push:
     working_directory: /dockerapp
     docker:
