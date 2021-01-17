@@ -66,7 +66,7 @@ jobs:
             
       - run:
           name: Smoke test
-          command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" curl -s -o /dev/null -w "%{http_code}" https://whispering-forest-11533.herokuapp.com/api/articles`
+          command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/api/articles`
       - run:
           name: Smoke test check
           command:  if [[ "$HTTPCODE" -ne 200 ]];then
