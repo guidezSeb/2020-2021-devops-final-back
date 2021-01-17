@@ -27,7 +27,7 @@ class Config(object):
         'http://localhost:4000',
         'http://0.0.0.0:' + os.environ.get('PORT', '8080'),
         'https://0.0.0.0:' + os.environ.get('PORT', '8080'),
-        'https://tp-devops-final.netlify.app',
+        'https://reverent-swanson-5ad65a.netlify.app',
         os.environ.get('FRONT_PROD_URL', ''),
     ]
     JWT_HEADER_TYPE = 'Token'
