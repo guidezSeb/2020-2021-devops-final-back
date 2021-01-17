@@ -109,7 +109,10 @@ workflows:
           context: Heroku-tp-final
           requires: 
             - build
+             # - test
+
       - docker-build-push:
           context: Docker-tp-final
           requires: 
             - build
+            # - test
