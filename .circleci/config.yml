@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.9-buster-node-browsers
-      environment:
+        environment:
           DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/psdb
           FLASK_APP: autoapp.py
           CONDUIT_SECRET: 'something-really-secret'
