@@ -28,6 +28,7 @@ class Config(object):
         'http://0.0.0.0:' + os.environ.get('PORT', '8080'),
         'https://0.0.0.0:' + os.environ.get('PORT', '8080'),
         'https://reverent-swanson-5ad65a.netlify.app',
+        'http://reverent-swanson-5ad65a.netlify.app',
         os.environ.get('FRONT_PROD_URL', ''),
     ]
     JWT_HEADER_TYPE = 'Token'
